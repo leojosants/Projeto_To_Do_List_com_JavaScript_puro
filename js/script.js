@@ -18,10 +18,14 @@ const editInput = document.querySelector("#edit_input");
 // <button id="cancel_edit_btn">Cancelar</button>
 const cancelEditBtn = document.querySelector("#cancel_edit_btn");
 
+const searchInput = document.querySelector("#search_input");
+const eraseBtn = document.querySelector("#erase_button");
+const filterBtn = document.querySelector("#filter_select");
+
 let oldInputValue;
 
 // Funções //
-const saveTodo = (text) => {
+const saveTodo = (text, done = 0, save = 1) => {
 
     const todo = document.createElement("div");
     // <div></div>
@@ -113,6 +117,15 @@ const saveTodo = (text) => {
 
     // console.log(todo);
 
+    // Utilizando dados da localStorage
+    if (done) {
+        todo.classList.add("done");
+    }
+
+    if (save) {
+        saveTodoLocalStorage({ text, done: 0 });
+    }
+
     todoList.appendChild(todo);
     /*  
         <div class="todo">
@@ -165,125 +178,224 @@ const updateTodo = (text) => {
     const todos = document.querySelectorAll(".todo");
 
     // Percorrendo cada elemento
-    todos.forEach(
-        
-        (todo) => {
-        
-            // Capturando o título de cada elemento de tag 'h3'
-            let todoTitle = todo.querySelector("h3");
+    todos.forEach((todo) => {
 
-            // Validando se título atual (em cada elemento) é igual ao salvo na emória fictícia
-            if (todoTitle.innerText === oldInputValue) {
-                
-                // Alterando o conteúdo do elemento peplo conteúdo recebido por parâmetro (text)
-                todoTitle.innerHTML = text;
-            }
+        // Capturando o título de cada elemento de tag 'h3'
+        let todoTitle = todo.querySelector("h3");
+
+        // Validando se título atual (em cada elemento) é igual ao salvo na emória fictícia
+        if (todoTitle.innerText === oldInputValue) {
+
+            // Alterando o conteúdo do elemento peplo conteúdo recebido por parâmetro (text)
+            todoTitle.innerText = text;
+
+            // Utilizando dados da localStorage
+            updateTodoLocalStorage(oldInputValue, text)
         }
-    );
+    });
+};
+
+// Função para buscar
+const getSearchedTodos = (search) => {
+    const todos = document.querySelectorAll(".todo");
+
+    todos.forEach((todo) => {
+        const todoTitle = todo.querySelector("h3").innerText.toLowerCase();
+
+        todo.style.display = "flex";
+
+        // console.log(todoTitle);
+
+        if (!todoTitle.includes(search)) {
+            todo.style.display = "none";
+        }
+    });
+};
+
+// Função para filtro
+const filterTodos = (filterValue) => {
+    const todos = document.querySelectorAll(".todo");
+
+    switch (filterValue) {
+        case "all":
+            todos.forEach((todo) => (todo.style.display = "flex"));
+            break;
+
+        case "done":
+            todos.forEach((todo) => todo.classList.contains("done") ? (todo.style.display = "flex") : (todo.style.display = "none"));
+            break;
+
+        case "todo":
+            todos.forEach((todo) => !todo.classList.contains("done") ? (todo.style.display = "flex") : (todo.style.display = "none"));
+            break;
+
+        default:
+            break;
+    }
 };
 
 // Eventos //
-todoForm.addEventListener("submit",
+todoForm.addEventListener("submit", (e) => {
 
-    (e) => {
+    // Alterando o comportamento padrão de submeter doumento
+    e.preventDefault();
 
-        // Alterando o comportamento padrão de submeter doumento
-        e.preventDefault();
+    // console.log("Enviou form!")
 
-        // console.log("Enviou form!")
+    // Capturando conteúdo digitado no campo
+    const inputValue = todoInput.value;
 
-        // Capturando conteúdo digitado no campo
-        const inputValue = todoInput.value;
-
-        if (inputValue) {
-            // console.log(inputValue);
-            saveTodo(inputValue);
-        }
+    if (inputValue) {
+        // console.log(inputValue);
+        saveTodo(inputValue);
     }
-);
+});
 
 // Mapeando click nos botões
-document.addEventListener("click",
+document.addEventListener("click", (e) => {
 
-    (e) => {
-        // Capturando o elemento de fato clicado
-        const targetElemento = e.target;
+    // Capturando o elemento de fato clicado
+    const targetElemento = e.target;
 
-        // Capturando a 'div' pai do elemento de fato clicado
-        const parentElemento = targetElemento.closest("div");
+    // Capturando a 'div' pai do elemento de fato clicado
+    const parentElemento = targetElemento.closest("div");
 
-        let todoTitle;
+    let todoTitle;
 
-        // Validando se possui uma 'div' pai, e se nesta,  possui alguma tag 'h3'
-        if (parentElemento && parentElemento.querySelector("h3")) {
+    // Validando se possui uma 'div' pai, e se nesta,  possui alguma tag 'h3'
+    if (parentElemento && parentElemento.querySelector("h3")) {
 
-            // Variável recebendo o conteudo da tag 'h3'
-            todoTitle = parentElemento.querySelector("h3").innerText;
-        }
-
-        // Validando se o elemento clicado possui tal classe
-        if (targetElemento.classList.contains("finish_todo")) {
-            console.log("O botão da classe 'finish_todo' foi clicado.");
-
-            parentElemento.classList.toggle("done");
-            /*
-                <div class="todo">       -->     <div class="todo done">
-                <div class="todo done">  -->     <div class="todo">
-            */
-        }
-
-        // Validando se o elemento clicado possui tal classe
-        if (targetElemento.classList.contains("edit_todo")) {
-            console.log("O botão da classe 'edit_todo' foi clicado.");
-            
-            // Função para alteração de comportamento
-            toggleForms();
-
-            // Pré preenchimento do valor no input
-            editInput.value = todoTitle;
-
-            // Salvando o valor na memória fictícia
-            oldInputValue = todoTitle;
-        }
-
-        // Validando se o elemento clicado possui tal classe
-        if (targetElemento.classList.contains("remove_todo")) {
-            console.log("O botão da classe 'remove_todo' foi clicado.");
-            parentElemento.remove();
-
-        }
+        // Variável recebendo o conteudo da tag 'h3'
+        todoTitle = parentElemento.querySelector("h3").innerText || "";
     }
-);
 
-// Mapeando click nos botões
-cancelEditBtn.addEventListener("click",
+    // Validando se o elemento clicado possui tal classe
+    if (targetElemento.classList.contains("finish_todo")) {
+        // console.log("O botão da classe 'finish_todo' foi clicado.");
 
-    (e) => {
+        parentElemento.classList.toggle("done");
+        /*
+            <div class="todo">       -->     <div class="todo done">
+            <div class="todo done">  -->     <div class="todo">
+        */
 
-        // Alterando o comportamento padrão de submeter doumento
-        e.preventDefault();
+        updateTodoStatusLocalStorage(todoTitle);
+    }
+
+    // Validando se o elemento clicado possui tal classe
+    if (targetElemento.classList.contains("remove_todo")) {
+        // console.log("O botão da classe 'remove_todo' foi clicado.");
+
+        parentElemento.remove();
+
+        // Utilizando dados da localStorage
+        removeTodoLocalStorage(todoTitle);
+    }
+
+    // Validando se o elemento clicado possui tal classe
+    if (targetElemento.classList.contains("edit_todo")) {
+        // console.log("O botão da classe 'edit_todo' foi clicado.");
 
         // Função para alteração de comportamento
         toggleForms();
+
+        // Pré preenchimento do valor no input
+        editInput.value = todoTitle;
+
+        // Salvando o valor na memória fictícia
+        oldInputValue = todoTitle;
     }
-);
+
+});
 
 // Mapeando click nos botões
-editForm.addEventListener("submit",
+cancelEditBtn.addEventListener("click", (e) => {
 
-    (e) => {
+    // Alterando o comportamento padrão de submeter doumento
+    e.preventDefault();
 
-        // Alterando o comportamento padrão de submeter doumento
-        e.preventDefault();
+    // Função para alteração de comportamento
+    toggleForms();
+});
 
-        // Capturando o novo valor editado
-        const editInputValue = editInput.value;
+// Mapeando click nos botões
+editForm.addEventListener("submit", (e) => {
 
-        if (editInputValue) {
-            updateTodo(editInputValue);
-        }
+    // Alterando o comportamento padrão de submeter doumento
+    e.preventDefault();
 
-        // Função para alteração de comportamento
-        toggleForms()
+    // Capturando o novo valor editado
+    const editInputValue = editInput.value;
+
+    if (editInputValue) {
+        updateTodo(editInputValue);
     }
-);
+
+    // Função para alteração de comportamento
+    toggleForms()
+});
+
+searchInput.addEventListener("keyup", (e) => {
+    const search = e.target.value;
+    getSearchedTodos(search)
+});
+
+eraseBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    searchInput.value = "";
+
+    searchInput.dispatchEvent(new Event("keyup"));
+});
+
+filterBtn.addEventListener("change", (e) => {
+    const filterValue = e.target.value;
+    filterTodos(filterValue);
+});
+
+// Local Storage
+const getTodosLocalStorage = () => {
+    const todos = JSON.parse(localStorage.getItem("todos")) || [];
+    return todos;
+};
+
+const loadTodos = () => {
+    const todos = getTodosLocalStorage();
+
+    todos.forEach((todo) => {
+        saveTodo(todo.text, todo.done, 0);
+    });
+};
+
+const saveTodoLocalStorage = (todo) => {
+    const todos = getTodosLocalStorage();
+
+    todos.push(todo);
+
+    localStorage.setItem("todos", JSON.stringify(todos));
+};
+
+const removeTodoLocalStorage = (todoText) => {
+    const todos = getTodosLocalStorage();
+    const filteredTodos = todos.filter((todo) => todo.text != todoText);
+
+    localStorage.setItem("todos", JSON.stringify(filteredTodos));
+};
+
+const updateTodoStatusLocalStorage = (todoText) => {
+    const todos = getTodosLocalStorage();
+
+    todos.map((todo) => todo.text === todoText ? (todo.done = !todo.done) : null);
+
+    localStorage.setItem("todos", JSON.stringify(todos));
+};
+
+const updateTodoLocalStorage = (todoOldText, todoNewText) => {
+    const todos = getTodosLocalStorage();
+
+    todos.map((todo) => todo.text === todoOldText ? (todo.text = todoNewText) : null);
+
+    localStorage.setItem("todos", JSON.stringify(todos));
+};
+
+loadTodos();

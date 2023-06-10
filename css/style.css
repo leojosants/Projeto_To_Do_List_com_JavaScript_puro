@@ -16,6 +16,7 @@
     --corccc: #ccc;
     --corddd: #ddd;
     --cor395169: #395169;
+    --cor444: #444;
 }
 
 body {
@@ -100,6 +101,7 @@ input, select {
 
 #cancel_edit_btn {
     margin-top: 1rem;
+    color: var(--cor444);
 }
 
 /* TODO toolbar */
