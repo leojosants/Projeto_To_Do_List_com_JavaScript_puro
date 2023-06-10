@@ -1,0 +1,170 @@
+/* Configuração Global */
+
+* {
+    padding: 0;
+    margin: 0;
+    font-family: Helvetica;
+    color: var(--cor333);
+    box-sizing: border-box;
+}
+
+:root {
+    --cor333: #333;
+    --corfdfdfd: #fdfdfd;
+    --cor102f5e: #102f5e;
+    --corfff: #fff;
+    --corccc: #ccc;
+    --corddd: #ddd;
+    --cor395169: #395169;
+}
+
+body {
+    background-image: url('../img/bg.jpg');
+    background-position: center;
+    
+    /* background-size: auto; */
+    background-size: cover;
+
+    /* background-repeat: no-repeat; */
+}
+
+button {
+    background-color: var(--corfdfdfd);
+    color: var(--cor102f5e);
+    border: 2px solid var(--cor102f5e);
+    padding: .3rem .6rem;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 0.4s;
+}
+
+button:hover {
+    background-color: var(--cor102f5e);
+    color: var(--corfff);
+}
+
+button:hover>i {
+    color: var(--corfff);
+}
+
+button i {
+    color: var(--cor102f5e);
+    font-weight: bold;
+    pointer-events: none;
+}
+
+input, select {
+    padding: 0.25rem, 0.5rem;
+}
+
+.hide {
+    display: none;
+}
+
+/* TODO header */
+.todo_container {
+    max-width: 450px;
+    margin: 3rem auto;
+    background-color: var(--corfdfdfd);
+    padding: 1.5rem;
+    border-radius: 15px;
+}
+
+.todo_container header {
+    text-align: center;
+    padding: 0 1rem 1rem;
+    border-bottom: 1px solid var(--corccc);
+}
+
+/* TODO  */
+#todo_form, #edit_form {
+    padding: 1rem;
+    border-bottom: 1px solid var(--corccc);
+}
+
+#todo_form p, #edit_form p {
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.form_control {
+    display: flex;
+}
+
+.form_control input {
+    margin-right: 0.3rem;
+}
+
+#cancel_edit_btn {
+    margin-top: 1rem;
+}
+
+/* TODO toolbar */
+#toolbar {
+    padding: 1rem;
+    border-bottom: 1px solid var(--corccc);
+    display: flex;
+}
+
+#toolbar h4 {
+    margin-bottom: .5rem;
+}
+
+#search {
+    border-right: 1px solid var(--corddd);
+    padding-right: 1rem;
+    margin-right: 1rem;
+    width: 65%;
+    display: flex;
+    flex-direction: column;
+}
+
+#search form {
+    display: flex;
+}
+
+#search input {
+    width: 100%;
+    margin-right: 0.3rem;
+}
+
+#filter {
+    width: 35%;
+    display: flex;
+    flex-direction: column;
+}
+
+#filter select {
+    flex: 1;
+}
+
+/* TODO List */
+.todo {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--corddd);
+    transform: .3s;
+}
+
+.todo h3 {
+    flex: 1;
+    font-size: 0.9rem;
+}
+
+.todo button {
+    margin-left: 0.4rem;
+}
+.done {
+    background-color: var(--cor395169);
+}
+
+.done h3 {
+    color: var(--corfff);
+    text-decoration: line-through;
+    font-style: italic;
+}
